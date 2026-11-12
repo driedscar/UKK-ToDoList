@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>doit — plan, track, repeat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- ================= LEFT: calendar + folders ================= -->
+    <aside class="left">
+      <div class="brand"><span class="brand-mark">✳</span>doit<span class="brand-dot">.</span></div>
+
+      <section id="miniCal" class="mini"></section>
+
+      <section class="folders-wrap">
+        <div class="side-label">
+          <span>Folders</span>
+          <button type="button" id="addFolderBtn" class="icon-btn" aria-label="New folder">+</button>
+        </div>
+        <nav id="folders" class="folders"></nav>
+      </section>
+
+      <div class="sticker">Drag a task onto a folder, a day or a column to move it ✦</div>
+    </aside>
+
+    <!-- ================= CENTER: main work area ================= -->
+    <main class="center">
+      <header class="topbar">
+        <div class="greet">
+          <h1 id="greeting">Hello</h1>
+          <p id="subGreeting"></p>
+        </div>
+        <div class="top-actions">
+          <label class="search">
+            <svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input id="search" type="search" placeholder="Search tasks…" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <button type="button" id="themeBtn" class="round-btn" aria-label="Toggle dark mode" title="Toggle theme">
+            <svg class="i" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+          </button>
+          <button type="button" id="newBtn" class="btn btn-dark new-btn">+ New task</button>
+        </div>
+      </header>
+
+      <div id="weekStrip" class="weekstrip"></div>
+
+      <form id="quickAdd" class="quick" autocomplete="off">
+        <input id="quickInput" type="text" maxlength="140" placeholder="Quick add…">
+        <button class="btn btn-white" type="submit">Add</button>
+      </form>
+
+      <div class="viewbar">
+        <div class="tabs" id="viewTabs">
+          <button type="button" data-view="agenda">Agenda</button>
+          <button type="button" data-view="board">Board</button>
+          <button type="button" data-view="month">Month</button>
+        </div>
+        <select id="prioFilter" class="filter" aria-label="Filter by priority">
+          <option value="all">All priorities</option>
+          <option value="high">High</option>
+          <option value="mid">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <div id="folderBar" class="folder-bar" hidden>
+        <span class="fb-dot" id="fbDot"></span>
+        <b id="fbName"></b>
+        <button type="button" id="editFolderBtn" class="chip-btn">Edit</button>
+        <button type="button" id="deleteFolderBtn" class="chip-btn danger">Delete</button>
+      </div>
+
+      <section id="viewAgenda" class="view"></section>
+      <section id="viewBoard" class="view"></section>
+      <section id="viewMonth" class="view"></section>
+    </main>
+
+    <!-- ================= RIGHT: insights ================= -->
+    <aside class="right" id="insights">
+      <section class="card ring-card">
+        <div class="ring">
+          <svg viewBox="0 0 100 100">
+            <circle class="ring-bg" cx="50" cy="50" r="42"/>
+            <circle id="ringFg" class="ring-fg" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="0 100"/>
+          </svg>
+          <div class="ring-text"><b id="ringNum">0/0</b><small>today</small></div>
+        </div>
+        <div class="ring-side">
+          <h3>Today's focus</h3>
+          <p id="ringMsg"></p>
+        </div>
+      </section>
+
+      <section class="tiles">
+        <div class="tile t-lime"><b id="tStreak">0</b><span>day streak</span></div>
+        <div class="tile t-pink"><b id="tOverdue">0</b><span>overdue</span></div>
+        <div class="tile t-blue"><b id="tWeek">0</b><span>done this week</span></div>
+        <div class="tile t-yellow"><b id="tOpen">0</b><span>open tasks</span></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h3>Last 7 days</h3><span id="deltaBadge" class="badge">0</span></div>
+        <div id="bars" class="bars"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h3>Consistency</h3><span class="muted-s">14 weeks</span></div>
+        <div id="heat" class="heat"></div>
+        <div class="heat-legend"><span>Less</span><i class="hm l0"></i><i class="hm l1"></i><i class="hm l2"></i><i class="hm l3"></i><i class="hm l4"></i><span>More</span></div>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h3>Up next</h3></div>
+        <ul id="upNext" class="upnext"></ul>
+      </section>
+
+      <div class="reset-row">
+        <button type="button" id="resetBtn" class="chip-btn">Reset Your List</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ================= MOBILE NAV ================= -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button type="button" data-view="agenda" aria-label="Agenda"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Agenda</span></button>
+    <button type="button" data-view="board" aria-label="Board"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="10" y="4" width="5" height="10" rx="1.5"/><rect x="17" y="4" width="4" height="13" rx="1.5"/></svg><span>Board</span></button>
+    <button type="button" data-view="month" aria-label="Month"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Month</span></button>
+    <button type="button" data-view="stats" aria-label="Insights"><svg class="i" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Stats</span></button>
+  </nav>
+  <button type="button" id="fab" class="fab" aria-label="New task"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+
+  <!-- ================= DIALOG: TASK ================= -->
+  <dialog id="taskDialog">
+    <form id="taskForm" class="dialog-form">
+      <h2 id="taskDialogTitle">New task</h2>
+      <label>Title
+        <input id="fTitle" type="text" maxlength="120" required placeholder="What needs to get done?">
+      </label>
+      <label>Notes
+        <textarea id="fNote" rows="2" maxlength="400" placeholder="Optional details"></textarea>
+      </label>
+      <div class="grid2">
+        <label>Date
+          <input id="fDate" type="date">
+        </label>
+        <label>Time
+          <input id="fTime" type="time">
+        </label>
+      </div>
+      <div class="grid3">
+        <label>Priority
+          <select id="fPriority">
+            <option value="low">Low</option>
+            <option value="mid">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </label>
+        <label>Status
+          <select id="fStatus">
+            <option value="todo">To do</option>
+            <option value="doing">In progress</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+        <label>Folder
+          <select id="fFolder"></select>
+        </label>
+      </div>
+
+      <div class="subs-edit">
+        <div class="label-like">Subtasks</div>
+        <ul id="subList"></ul>
+        <div class="sub-add">
+          <input id="subInput" type="text" maxlength="80" placeholder="Add a subtask, press Enter">
+          <button type="button" id="subAddBtn" class="btn">Add</button>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" id="deleteTaskBtn" class="btn btn-danger" hidden>Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-close>Cancel</button>
+        <button type="submit" class="btn btn-dark">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ================= DIALOG: FOLDER ================= -->
+  <dialog id="folderDialog">
+    <form id="folderForm" class="dialog-form">
+      <h2 id="folderDialogTitle">New folder</h2>
+      <label>Folder name
+        <input id="folderName" type="text" maxlength="24" required>
+      </label>
+      <div class="label-like">Color</div>
+      <div id="swatches" class="swatches"></div>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-close>Cancel</button>
+        <button type="submit" class="btn btn-dark">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ================= DIALOG: RESET CONFIRMATION ================= -->
+  <dialog id="resetDialog" class="confirm-dialog" aria-labelledby="resetDialogTitle">
+    <div class="confirm-content">
+      <div class="confirm-icon" aria-hidden="true">!</div>
+      <h2 id="resetDialogTitle">Reset your to-do list?</h2>
+      <p>This will permanently delete all folders and tasks. This action cannot be undone.</p>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-close>No, keep my list</button>
+        <button type="button" id="confirmResetBtn" class="btn btn-danger">Yes, reset</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
